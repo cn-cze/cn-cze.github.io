@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+	</head>
+	<body>
+		<input type="text" id="text-name" placeholder="请输入名称" value="" />
+		<input type="range" id="text-size" min="15" max="70" value="40">
+		<button id="download" onclick="downImg()">下载</button>
+		<div id="head" style="">
+			<p id="head-text"></p>
+			<img src="back.png" alt="" id="head-img">
+		</div>
+	</body>
+</html>
+
+<script type="text/javascript">
+	$('#text-name').keyup(() => {
+		$('#head-text').text($('#text-name').val());
+	});
+
+	$('#text-size').on('input', function() {
+		$('#head-text').css('font-size', $(this).val() + 'px');
+	});
+	const downImg = () => {
+		const divToCapture = document.querySelector('#head');
+		html2canvas(divToCapture).then((canvas) => {
+			// 将 Canvas 上的图像转换为 Base64 编码的数据 URL
+			const imageDataURL = canvas.toDataURL('image/png');
+
+			// 创建一个下载链接
+			const a = document.createElement('a');
+			a.href = imageDataURL;
+			// 设置下载的文件名
+			a.download = $('#text-name').val() + '.png';
+			// 模拟点击下载链接
+			a.click();
+		});
+	}
+</script>
+
+<style type="text/css">
+	@font-face {
+		font-family: font;
+		src: url('font.ttf') format('truetype');
+	}
+
+	#head {
+		width: 600px;
+		height: 600px;
+		position: relative;
+		background-color: #000000;
+	}
+
+	#head-img {
+		width: 100%;
+		height: 100%;
+	}
+
+
+	#download {
+		width: 600px;
+		height: 40px;
+		margin-bottom: 24px;
+	}
+
+	#head-text {
+		position: absolute;
+		bottom: 446px;
+		width: 100%;
+		color: #cdecff;
+		z-index: 999;
+		font-size: 40px;
+		margin: 0;
+		height: 70px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	#text-name {
+		width: 600px;
+		display: block;
+	}
+
+	#text-size {
+		width: 600px;
+		display: block;
+	}
+
+	#head-text {
+		font-family: font;
+	}
+
+	input {
+		width: 100%;
+		padding: 12px;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		box-sizing: border-box;
+		margin-bottom: 10px;
+		font-size: 16px;
+		transition: border-color 0.3s ease;
+	}
+
+
+	input:focus {
+		outline: none;
+		border-color: #66afe9;
+	}
+
+	input:disabled {
+		background-color: #f2f2f2;
+		cursor: not-allowed;
+	}
+</style>
