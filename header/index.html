@@ -3,40 +3,45 @@
 	<head>
 		<meta charset="utf-8">
 		<title></title>
-		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 	</head>
 	<body>
 		<input type="text" id="text-name" placeholder="请输入名称" value="" />
-		<input type="range" id="text-size" min="15" max="70" value="40">
-		<button id="download" onclick="downImg()">下载</button>
-		<div id="head" style="">
-			<p id="head-text"></p>
-			<img src="back.png" alt="" id="head-img">
+		<input type="range" id="text-size" min="15" max="80" value="40">
+		<div id="__t">
+			<div id="head" style="">
+				<p id="head-text"></p>
+				<img src="back.png" alt="" id="head-img">
+			</div>
+			<input type="range" id="text-top" min="-30" max="30" step="1" value="0">
+			<p id="text-top-val">0</p>
 		</div>
+		<button id="download" onclick="downImg()">下载</button>
+		<p>©cn-cze czei</p>
 	</body>
 </html>
 
 <script type="text/javascript">
-	$('#text-name').keyup(() => {
-		$('#head-text').text($('#text-name').val());
+	document.getElementById('text-name').addEventListener('keyup', () => {
+		document.getElementById('head-text').textContent = document.getElementById('text-name').value;
 	});
 
-	$('#text-size').on('input', function() {
-		$('#head-text').css('font-size', $(this).val() + 'px');
+	document.getElementById('text-size').addEventListener('input', () => {
+		document.getElementById('head-text').style.fontSize = document.getElementById('text-size').value + 'px';
 	});
+
+	document.getElementById('text-top').addEventListener('input', () => {
+		const sliderValue = -1 * document.getElementById('text-top').value;
+		document.getElementById('head-text').style.transform = `translateY(${sliderValue}px)`;
+		document.getElementById('text-top-val').innerText = -1 * sliderValue;
+	});
+
 	const downImg = () => {
-		const divToCapture = document.querySelector('#head');
-		html2canvas(divToCapture).then((canvas) => {
-			// 将 Canvas 上的图像转换为 Base64 编码的数据 URL
+		html2canvas(document.querySelector('#head')).then((canvas) => {
 			const imageDataURL = canvas.toDataURL('image/png');
-
-			// 创建一个下载链接
 			const a = document.createElement('a');
 			a.href = imageDataURL;
-			// 设置下载的文件名
-			a.download = $('#text-name').val() + '.png';
-			// 模拟点击下载链接
+			a.download = document.getElementById('text-name').value + '.png';
 			a.click();
 		});
 	}
@@ -46,6 +51,11 @@
 	@font-face {
 		font-family: font;
 		src: url('font.ttf') format('truetype');
+	}
+
+	body {
+		display: flex;
+		flex-direction: column;
 	}
 
 	#head {
@@ -83,16 +93,28 @@
 
 	#text-name {
 		width: 600px;
-		display: block;
 	}
 
 	#text-size {
 		width: 600px;
-		display: block;
 	}
 
 	#head-text {
 		font-family: font;
+	}
+
+	#__t {
+		display: flex;
+		flex-direction: row;
+	}
+
+	#text-top {
+		writing-mode: bt-lr;
+		-webkit-appearance: slider-vertical;
+		appearance: slider-vertical;
+		width: 20px;
+		height: 600px;
+		margin-left: 20px;
 	}
 
 	input {
