@@ -1,0 +1,76 @@
+#room-info,
+#prize-info,
+#title-info {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	flex-direction: row;
+	flex-wrap: wrap;
+	margin-bottom: 20px;
+}
+
+#room-info>.el-input,
+#prize-info>.el-input {
+	width: 340px;
+	margin-right: 20px;
+}
+
+#title-info>.el-input {
+	width: 640px;
+}
+
+.ws-success {
+	display: flex;
+	align-items: center;
+}
+
+.ws-success>div {
+	width: 15px;
+	height: 15px;
+	background: green;
+	border-radius: 50%;
+	margin: 0 5px 0 20px;
+}
+
+#prizeed-users{
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	align-content: flex-start;
+}
+
+#prize-users {
+	margin-top: 20px;
+	width: 100%;
+	min-height: 300px;
+	border: 1px solid #dcdfe6;
+	border-radius: 4px;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	align-content: flex-start;
+}
+
+.el-tag--light {
+	margin: 5px;
+	font-size: 16px;
+	padding: 0 20px;
+}
+
+.users-length {
+	color: #606266;
+	margin: 20px 0;
+}
+
+.el-dialog__body {
+	height: calc(100% - 120px);
+}
+
+.dialog-tip {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 24px;
+}
