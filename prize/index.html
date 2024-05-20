@@ -14,7 +14,7 @@
 			<div id="room-info">
 				<label class="el-form-item__label" for="room_id">房间号</label>
 				<el-input v-model="room_id" id="room_id" placeholder="请输入房间号"></el-input>
-				<el-button @click="doWebsocket()">开始读取弹幕</el-button>
+				<el-button @click="doWebsocket()" :type="ws_lock ? 'primary' : ''" v-text="ws_lock ? '暂停读取弹幕' : '开始读取弹幕'"></el-button>
 				<div class="ws-success" v-show="ws_lock">
 					<div></div>
 					已开启连接
@@ -31,7 +31,7 @@
 			<el-divider></el-divider>
 			<div id="title-info">
 				<label class="el-form-item__label" for="title_name">标题名称</label>
-				<el-input v-model="title_name" id="title_name" placeholder="请输入标题名称"></el-input>
+				<el-input v-model="title_name" id="title_name" placeholder="请输入标题名称(竖线键 | 代表换行)"></el-input>
 			</div>
 			<div id="prize-info">
 				<label class="el-form-item__label" for="prize_name">奖品名称</label>
@@ -42,13 +42,16 @@
 			</div>
 
 
-			<el-dialog :title="title_name + ' - ' + prize_name + ' * ' + prize_length" :visible.sync="dialogVisible" :fullscreen="true"
-			 :close-on-press-escape="false" :close-on-click-modal="false">
-				<div class="dialog-tip" v-show="!prize_lock" @keydown="doPrize">按下空格开始\停止抽奖</div>
-				<div id="prizeed-users">
-					<el-tag v-for="user in prize_users" type="success">
-						<span v-text="user"></span>
-					</el-tag>
+			<el-dialog :visible.sync="dialogVisible" :fullscreen="true"
+			 :close-on-press-escape="false" :close-on-click-modal="false" :before-close="handleClose">
+				<div id="dialog-tip" class="dialog-tip" v-show="!prize_lock">按下空格开始\停止抽奖</div>
+				<div id="prizeed-users" v-show="prize_lock">
+					<p class="prizeed-title" v-html="formatTitle(title_name)"></p>
+					<p class="prizeed-prize" v-text="prize_name + '(' + prize_length + ')'"></p>
+					<div class="prizeed-list">
+						<div v-for="user in prize_users" v-text="user" class="prizeed-user">
+						</div>
+					</div>
 				</div>
 			</el-dialog>
 		</div>
@@ -93,7 +96,6 @@
 			users: [],
 			dialogVisible: false,
 			prize_users: [],
-
 		},
 		mounted() {
 			setTimeout(() => {
@@ -102,27 +104,47 @@
 		},
 		methods: {
 			doWebsocket(e) {
-				if (!app.ws_lock) {
+				app.ws_lock = !app.ws_lock;
+				if (app.ws_lock) {
 					new Ex_WebSocket_UnLogin(app.room_id, (msg) => {
 						if (msg.startsWith('type@=chatmsg')) {
 							msg.split('/').forEach(m => {
-								if (m.startsWith('nn@=')) {
+								console.log(m.startsWith('nn@=') && !app.users.includes(m.split('=')[1]))
+								if (m.startsWith('nn@=') && !app.users.includes(m.split('=')[1]) && app.ws_lock) {
 									app.users.push(m.split('=')[1]);
 								}
 							});
 						}
 					});
 				}
-				app.ws_lock = true;
+
 			},
 			addUser() {
-				app.users.push(app.add_user);
+				if (!app.users.includes(app.add_user)) {
+					app.users.push(app.add_user);
+				}
 				app.add_user = '';
 			},
 			deleteUser(user) {
 				this.users.splice(this.users.indexOf(user), 1);
 			},
+			handleClose(done) {
+				app.prize_lock = false;
+				app.prize_users = [];
+				clearInterval(interval);
+				done();
+			},
 			doPrize() {
+				if (!/^[1-9]\d*$/.test(app.prize_length.trim())) {
+					this.$message.error('“中奖人数”格式不正确。');
+					return;
+				}
+				if (app.users.length == 0) {
+					this.$message.error('抽奖用户列表为空。');
+					return;
+				}
+
+				app.prize_lock = true;
 				interval = setInterval(() => {
 					let shuffledArray = app.users.slice();
 					for (let i = shuffledArray.length - 1; i > 0; i--) {
@@ -131,10 +153,12 @@
 					}
 					app.prize_users = shuffledArray.slice(0, app.prize_length);
 				}, 20);
-				app.prize_lock = true;
 			},
 			doPrizeDone() {
 				clearInterval(interval);
+			},
+			formatTitle(title){
+				return title.replaceAll('|','<br>');
 			}
 		}
 	});
